@@ -1,0 +1,9 @@
+#board {
+    display: grid;
+}
+
+.closed {
+    background-color: darkgray;
+    border: solid 1px black;
+    /* color: transparent; */
+}
