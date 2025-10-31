@@ -96,7 +96,7 @@ function generateBoard() {
     for (let i = 0; i < (difficulty.x * difficulty.y); i++) {
         const square = document.createElement('div');
         square.classList.add('square', 'closed')
-        square.textContent = i
+        // square.textContent = i
         board.appendChild(square)
     }
 }
@@ -132,38 +132,115 @@ function populateMines() {
     //up = - x
         //can't go any further up if i < x
 
-function populateNumbers(i) {
+function populateNumbers() {
     const squares = document.querySelectorAll('.square')
-
-    /*----------BOUNDARY CONDITIONS----------*/
-    if(i % document.x === 0) {
-        //left edge
-    } else if((i + 1) % document.x === 0) {
-        //right edge
-    } else if(i < document.x) {
-        //top edge
-    } else if(i >= document.x * (document.y - 1)) {
-        //bottom edge
-    } else if(i === 0) {
-        //top left
-    } else if(i === document.x * (document.y - 1)) {
-        //botom left
-    } else if(i === document.x - 1) {
-        //top right
-    } else if(i === (document.x * document.y) - 1) {
-        //botom right
-    } else {
-        //central square
+    let adjacentMines;
+    for (let j = 0; j < squares.length; j++) {
+        const square = squares[j];
+        if(squares[j].textContent !== 'M') {
+            adjacentMines = 0
+            checkForMine(j)
+            assignNumber(j)
+        }
+        
     }
+    function checkForMine(i) {        
 
+        if(squares[i].textContent === 'M') {
+            adjacentMines ++
+        }
+
+
+        /*----------BOUNDARY CONDITIONS----------*/
+        if(i === 0) {
+            //top left
+                //check right, down, right+down
+            checkForMine(i + 1)
+            checkForMine(i + difficulty.x)
+            checkForMine(i + 1 + difficulty.x)
+        } else if(i === document.x * (document.y - 1)) {
+            //botom left
+                //check right, up, right+up
+            checkForMine(i + 1)
+            checkForMine(i - difficulty.x)
+            checkForMine(i + 1 - difficulty.x)
+        } else if(i === document.x - 1) {
+            //top right
+                //check left, down, left+down
+            checkForMine(i - 1)
+            checkForMine(i + difficulty.x)
+            checkForMine(i - 1 + difficulty.x)
+        } else if(i === (document.x * document.y) - 1) {
+            //botom right
+                //check left, up, left+up
+            checkForMine(i - 1)
+            checkForMine(i - difficulty.x)
+            checkForMine(i - 1 - difficulty.x)
+        } else if(i % document.x === 0) {
+            //left edge
+                //check up, right, down, up+right, down+right
+            checkForMine(i + 1)
+            checkForMine(i - difficulty.x)
+            checkForMine(i + difficulty.x)
+            checkForMine(i + 1 - difficulty.x)
+            checkForMine(i + 1 + difficulty.x)
+        } else if((i + 1) % document.x === 0) {
+            //right edge
+                // check up, left, down, up+left, down+left
+            checkForMine(i - 1)
+            checkForMine(i - difficulty.x)
+            checkForMine(i + difficulty.x)
+            checkForMine(i - 1 - difficulty.x)
+            checkForMine(i - 1 + difficulty.x)
+        } else if(i < document.x) {
+            //top edge
+                //check left, right, down, left+down, right+down
+            checkForMine(i + 1)
+            checkForMine(i - 1)
+            checkForMine(i + difficulty.x)
+            checkForMine(i + 1 + difficulty.x)
+            checkForMine(i - 1 + difficulty.x)
+        } else if(i >= document.x * (document.y - 1)) {
+            //bottom edge
+                //check left, right, up, left+up, right+up
+            checkForMine(i + 1)
+            checkForMine(i - 1)
+            checkForMine(i - difficulty.x)
+            checkForMine(i + 1 - difficulty.x)
+            checkForMine(i - 1 - difficulty.x)
+        } else {
+            //central square
+                //check up, down, left, right, up+left, up+right, down+left, down+right
+            checkForMine(i + 1)
+            checkForMine(i - 1)
+            checkForMine(i + difficulty.x)
+            checkForMine(i - difficulty.x)
+            checkForMine(i + 1 + difficulty.x)
+            checkForMine(i - 1 + difficulty.x)
+            checkForMine(i + 1 - difficulty.x)
+            checkForMine(i - 1 - difficulty.x)
+        }
+    }
     /*----------ACTUAL FUNCTION----------*/
     
+    // function checkForMine(j) {
+    //     if(squares[j].textContent === 'M') {
+    //         adjacentMines ++
+    //     }
+    // }
+    
+    function assignNumber(i) {
+        squares[i].classList.add(`${adjacentMines}`)
+        squares[i].textContent = adjacentMines
+        console.log(squares[i].textContent)
+    }
 
 
     /*----------RECURSION----------*/
-
-
-
+    // populateNumbers(i + 1)
+    // populateNumbers(i - 1)
+    // populateNumbers(i + difficulty.x)
+    // populateNumbers(i - difficulty.x)
 }
 
 /*---------------------CHECK FOR VICTORY---------------------*/
@@ -214,5 +291,5 @@ function populateNumbers(i) {
 
 
 generateBoard()
-// populateMines()
-// populateNumbers()
+populateMines()
+populateNumbers()
