@@ -43,6 +43,7 @@ for (let i = 0; i < chosenDifficulties.length; i++) {
         choseDifficulty()
         generateBoard()
         populateMines()
+        gapFill()
 
         } else {
             event.target.checked = true
@@ -114,6 +115,7 @@ function populateMines() {
         const square = squares[i];
         if(Math.random() < (minesLeft / (squares.length - i))) {
             square.textContent = 'M'
+            square.classList.add('mine')
             minesLeft -= 1            
         }        
     }
@@ -132,120 +134,208 @@ function populateMines() {
     //up = - x
         //can't go any further up if i < x
 
-function populateNumbers() {
-    const squares = document.querySelectorAll('.square')
-    let adjacentMines;
-    for (let j = 0; j < squares.length; j++) {
-        const square = squares[j];
-        if(squares[j].textContent !== 'M') {
-            adjacentMines = 0
-            checkForMine(j)
-            assignNumber(j)
-        }
-        
-    }
-    function checkForMine(i) {        
+/*-----------HELPER FUNCTIONS-----------*/
+let adjacentMines;
 
-        if(squares[i].textContent === 'M') {
+function checkForMine(squareList, i) {
+        if(squareList[i].classList.contains('mine')) {
             adjacentMines ++
         }
-
-
-        /*----------BOUNDARY CONDITIONS----------*/
-        if(i === 0) {
-            //top left
-                //check right, down, right+down
-            checkForMine(i + 1)
-            checkForMine(i + difficulty.x)
-            checkForMine(i + 1 + difficulty.x)
-        } else if(i === document.x * (document.y - 1)) {
-            //botom left
-                //check right, up, right+up
-            checkForMine(i + 1)
-            checkForMine(i - difficulty.x)
-            checkForMine(i + 1 - difficulty.x)
-        } else if(i === document.x - 1) {
-            //top right
-                //check left, down, left+down
-            checkForMine(i - 1)
-            checkForMine(i + difficulty.x)
-            checkForMine(i - 1 + difficulty.x)
-        } else if(i === (document.x * document.y) - 1) {
-            //botom right
-                //check left, up, left+up
-            checkForMine(i - 1)
-            checkForMine(i - difficulty.x)
-            checkForMine(i - 1 - difficulty.x)
-        } else if(i % document.x === 0) {
-            //left edge
-                //check up, right, down, up+right, down+right
-            checkForMine(i + 1)
-            checkForMine(i - difficulty.x)
-            checkForMine(i + difficulty.x)
-            checkForMine(i + 1 - difficulty.x)
-            checkForMine(i + 1 + difficulty.x)
-        } else if((i + 1) % document.x === 0) {
-            //right edge
-                // check up, left, down, up+left, down+left
-            checkForMine(i - 1)
-            checkForMine(i - difficulty.x)
-            checkForMine(i + difficulty.x)
-            checkForMine(i - 1 - difficulty.x)
-            checkForMine(i - 1 + difficulty.x)
-        } else if(i < document.x) {
-            //top edge
-                //check left, right, down, left+down, right+down
-            checkForMine(i + 1)
-            checkForMine(i - 1)
-            checkForMine(i + difficulty.x)
-            checkForMine(i + 1 + difficulty.x)
-            checkForMine(i - 1 + difficulty.x)
-        } else if(i >= document.x * (document.y - 1)) {
-            //bottom edge
-                //check left, right, up, left+up, right+up
-            checkForMine(i + 1)
-            checkForMine(i - 1)
-            checkForMine(i - difficulty.x)
-            checkForMine(i + 1 - difficulty.x)
-            checkForMine(i - 1 - difficulty.x)
-        } else {
-            //central square
-                //check up, down, left, right, up+left, up+right, down+left, down+right
-            checkForMine(i + 1)
-            checkForMine(i - 1)
-            checkForMine(i + difficulty.x)
-            checkForMine(i - difficulty.x)
-            checkForMine(i + 1 + difficulty.x)
-            checkForMine(i - 1 + difficulty.x)
-            checkForMine(i + 1 - difficulty.x)
-            checkForMine(i - 1 - difficulty.x)
-        }
-    }
-    /*----------ACTUAL FUNCTION----------*/
-    
-    // function checkForMine(j) {
-    //     if(squares[j].textContent === 'M') {
-    //         adjacentMines ++
-    //     }
-    // }
-    
-    function assignNumber(i) {
-        squares[i].classList.add(`${adjacentMines}`)
-        squares[i].textContent = adjacentMines
-        console.log(squares[i].textContent)
     }
 
-
-    /*----------RECURSION----------*/
-    // populateNumbers(i + 1)
-    // populateNumbers(i - 1)
-    // populateNumbers(i + difficulty.x)
-    // populateNumbers(i - difficulty.x)
+function assignNumber(squareList, i) {
+    if(squareList[i].textContent === '') {
+        squareList[i].textContent = adjacentMines
+        squareList[i].classList.add(`${adjacentMines}`)
+        // console.log(squares[i].textContent)
+    }
 }
+
+function surroundingMines(squareList, i) {
+    adjacentMines = 0
+    if(i === 0) {
+        //top left
+            //check right, down, right+down
+        checkForMine(squareList, i + 1)
+        checkForMine(squareList, i + difficulty.x)
+        checkForMine(squareList, i + 1 + difficulty.x)
+    } else if(i === difficulty.x * (difficulty.y - 1)) {
+        //botom left
+            //check right, up, right+up
+        checkForMine(squareList, i + 1)
+        checkForMine(squareList, i - difficulty.x)
+        checkForMine(squareList, i + 1 - difficulty.x)
+    } else if(i === difficulty.x - 1) {
+        //top right
+            //check left, down, left+down
+        checkForMine(squareList, i - 1)
+        checkForMine(squareList, i + difficulty.x)
+        checkForMine(squareList, i - 1 + difficulty.x)
+    } else if(i === (difficulty.x * difficulty.y) - 1) {
+        //botom right
+            //check left, up, left+up
+        checkForMine(squareList, i - 1)
+        checkForMine(squareList, i - difficulty.x)
+        checkForMine(squareList, i - 1 - difficulty.x)
+    } else if(i % difficulty.x === 0) {
+        //left edge
+            //check up, right, down, up+right, down+right
+        checkForMine(squareList, i + 1)
+        checkForMine(squareList, i - difficulty.x)
+        checkForMine(squareList, i + difficulty.x)
+        checkForMine(squareList, i + 1 - difficulty.x)
+        checkForMine(squareList, i + 1 + difficulty.x)
+    } else if((i + 1) % difficulty.x === 0) {
+        //right edge
+            // check up, left, down, up+left, down+left
+        checkForMine(squareList, i - 1)
+        checkForMine(squareList, i - difficulty.x)
+        checkForMine(squareList, i + difficulty.x)
+        checkForMine(squareList, i - 1 - difficulty.x)
+        checkForMine(squareList, i - 1 + difficulty.x)
+    } else if(i < difficulty.x) {
+        //top edge
+            //check left, right, down, left+down, right+down
+        checkForMine(squareList, i + 1)
+        checkForMine(squareList, i - 1)
+        checkForMine(squareList, i + difficulty.x)
+        checkForMine(squareList, i + 1 + difficulty.x)
+        checkForMine(squareList, i - 1 + difficulty.x)
+    } else if(i >= difficulty.x * (difficulty.y - 1)) {
+        //bottom edge
+            //check left, right, up, left+up, right+up
+        checkForMine(squareList, i + 1)
+        checkForMine(squareList, i - 1)
+        checkForMine(squareList, i - difficulty.x)
+        checkForMine(squareList, i + 1 - difficulty.x)
+        checkForMine(squareList, i - 1 - difficulty.x)
+    } else {
+        //central square
+            //check up, down, left, right, up+left, up+right, down+left, down+right
+        checkForMine(squareList, i + 1)
+        checkForMine(squareList, i - 1)
+        checkForMine(squareList, i + difficulty.x)
+        checkForMine(squareList, i - difficulty.x)
+        checkForMine(squareList, i + 1 + difficulty.x)
+        checkForMine(squareList, i - 1 + difficulty.x)
+        checkForMine(squareList, i + 1 - difficulty.x)
+        checkForMine(squareList, i - 1 - difficulty.x)
+    }
+}
+
+/*-----------POPULATE NUMBERS-----------*/
+
+function populateNumbers(squareList, i) {
+
+    if(squareList[i].textContent === ''){
+        surroundingMines(squareList, i)
+        assignNumber(squareList, i)
+    } else {
+        return
+    }
+
+    if(i === 0) {
+        //top left
+            //check right, down, right+down
+        populateNumbers(squareList, i + 1)
+        populateNumbers(squareList, i + difficulty.x)
+        populateNumbers(squareList, i + 1 + difficulty.x)
+        assignNumber(squareList, i)
+    } else if(i === difficulty.x * (difficulty.y - 1)) {
+        //botom left
+            //check right, up, right+up
+        populateNumbers(squareList, i + 1)
+        populateNumbers(squareList, i - difficulty.x)
+        populateNumbers(squareList, i + 1 - difficulty.x)
+        assignNumber(squareList, i)
+    } else if(i === difficulty.x - 1) {
+        //top right
+            //check left, down, left+down
+        populateNumbers(squareList, i- 1)
+        populateNumbers(squareList, i+ difficulty.x)
+        populateNumbers(squareList, i- 1 + difficulty.x)
+        assignNumber(squareList, i)
+    } else if(i === (difficulty.x * difficulty.y) - 1) {
+        //botom right
+            //check left, up, left+up
+        populateNumbers(squareList, i - 1)
+        populateNumbers(squareList, i - difficulty.x)
+        populateNumbers(squareList, i - 1 - difficulty.x)
+        assignNumber(squareList, i)
+    } else if(i % difficulty.x === 0) {
+        //left edge
+            //check up, right, down, up+right, down+right
+        populateNumbers(squareList, i + 1)
+        populateNumbers(squareList, i - difficulty.x)
+        populateNumbers(squareList, i + difficulty.x)
+        populateNumbers(squareList, i + 1 - difficulty.x)
+        populateNumbers(squareList, i + 1 + difficulty.x)
+        assignNumber(squareList, i)
+    } else if((i + 1) % difficulty.x === 0) {
+        //right edge
+            // check up, left, down, up+left, down+left
+        populateNumbers(squareList, i - 1)
+        populateNumbers(squareList, i - difficulty.x)
+        populateNumbers(squareList, i + difficulty.x)
+        populateNumbers(squareList, i - 1 - difficulty.x)
+        populateNumbers(squareList, i - 1 + difficulty.x)
+        assignNumber(squareList, i)
+    } else if(i < difficulty.x) {
+        //top edge
+            //check left, right, down, left+down, right+down
+        populateNumbers(squareList, i + 1)
+        populateNumbers(squareList, i - 1)
+        populateNumbers(squareList, i + difficulty.x)
+        populateNumbers(squareList, i + 1 + difficulty.x)
+        populateNumbers(squareList, i - 1 + difficulty.x)
+        assignNumber(squareList, i)
+    } else if(i >= difficulty.x * (difficulty.y - 1)) {
+        //bottom edge
+            //check left, right, up, left+up, right+up
+        populateNumbers(squareList, i + 1)
+        populateNumbers(squareList, i - 1)
+        populateNumbers(squareList, i - difficulty.x)
+        populateNumbers(squareList, i + 1 - difficulty.x)
+        populateNumbers(squareList, i - 1 - difficulty.x)
+        assignNumber(squareList, i)
+    } else {
+        //central square
+            //check up, down, left, right, up+left, up+right, down+left, down+right
+        populateNumbers(squareList, i + 1)
+        populateNumbers(squareList, i - 1)
+        populateNumbers(squareList, i + difficulty.x)
+        populateNumbers(squareList, i - difficulty.x)
+        populateNumbers(squareList, i + 1 + difficulty.x)
+        populateNumbers(squareList, i - 1 + difficulty.x)
+        populateNumbers(squareList, i + 1 - difficulty.x)
+        populateNumbers(squareList, i - 1 - difficulty.x)
+        assignNumber(squareList, i)
+    }
+}
+
+function gapFill() {
+    const squares = document.querySelectorAll('.square')
+    for (let i = 0; i < squares.length; i++) {
+        const square = squares[i];
+        if(square.textContent === '') {
+            populateNumbers(squares, i)
+        }        
+    }
+}
+
 
 /*---------------------CHECK FOR VICTORY---------------------*/
 
-
+function victory() {
+    const squares = document.querySelectorAll('.square')
+    for (let i = 0; i < squares.length; i++) {
+        const square = squares[i];
+        if(square.classList.contains('mine') === false && square.classList.contains('closed')) {
+            return
+        }
+    }
+    //victory condition (probably some CSS effect)
+}
 
 
 
@@ -292,4 +382,4 @@ function populateNumbers() {
 
 generateBoard()
 populateMines()
-populateNumbers()
+gapFill()
