@@ -8,7 +8,6 @@
 
 const resetButton = document.querySelector('#reset')
 
-
 /*---------------------DIFFICULTY---------------------*/
 
 class difficultyParams {
@@ -40,11 +39,7 @@ for (let i = 0; i < chosenDifficulties.length; i++) {
                     chosenDifficulty.checked = false
                 }            
             }
-        choseDifficulty()
-        generateBoard()
-        populateMines()
-        gapFill()
-
+            init()
         } else {
             event.target.checked = true
         }
@@ -69,8 +64,9 @@ function choseDifficulty() {
     }
 }
 
-/*---------------------MINES LEFT---------------------*/
-//mines - flags
+/*---------------------MINES REMAINING---------------------*/
+const minesRemaining = document.querySelector('#mines-remaining')
+minesRemaining.textContent = 'mines remaining: ' + difficulty.mines
 
 
 
@@ -146,8 +142,7 @@ function checkForMine(squareList, i) {
 function assignNumber(squareList, i) {
     if(squareList[i].textContent === '') {
         squareList[i].textContent = adjacentMines
-        squareList[i].classList.add(`${adjacentMines}`)
-        // console.log(squares[i].textContent)
+        squareList[i].setAttribute('id', `touching-${adjacentMines}`)
     }
 }
 
@@ -334,7 +329,9 @@ function victory() {
             return
         }
     }
-    //victory condition (probably some CSS effect)
+    resetButton.textContent = 'You Win!'
+    //freeze board
+    //flag all mines
 }
 
 
@@ -344,31 +341,141 @@ function victory() {
 
 
 /*---------------------LEFT CLICK---------------------*/
-
-
-/*-----------OPEN 0-----------*/
-
-
-/*-----------OPEN MINE-----------*/
-
-
-/*-----------OPEN NUMBER-----------*/
-
+function leftClick() {
+    const squares = document.querySelectorAll('.square')
+    const mines = document.querySelectorAll('.mine')        
+    for (let i = 0; i < squares.length; i++) {
+        const square = squares[i];
+        square.addEventListener('click', event => {
+            if(event.target.classList.contains('closed') && event.target.classList.contains('flagged') === false){
+                event.target.classList.replace('closed', 'open')            
+                if(event.target.classList.contains('mine')) {
+                    resetButton.textContent = 'You Lose'
+                    mines.classList.replace('closed', 'open')
+                } else if(square.id === 'touching-0'){
+                    if(i === 0) {
+                        //top left
+                            //check right, down, right+down
+                        squares[i + 1].click()
+                        squares[i + difficulty.x].click()
+                        squares[i + 1 + difficulty.x].click()            
+                    } else if(i === difficulty.x * (difficulty.y - 1)) {
+                        //botom left
+                            //check right, up, right+up
+                        squares[i + 1].click()
+                        squares[i - difficulty.x].click()
+                        squares[i + 1 - difficulty.x].click()            
+                    } else if(i === difficulty.x - 1) {
+                        //top right
+                            //check left, down, left+down
+                        squares[i - 1].click()
+                        squares[i + difficulty.x].click()
+                        squares[i - 1 + difficulty.x].click()            
+                    } else if(i === (difficulty.x * difficulty.y) - 1) {
+                        //botom right
+                            //check left, up, left+up
+                        squares[i - 1].click()
+                        squares[i - difficulty.x].click()
+                        squares[i - 1 - difficulty.x].click()            
+                    } else if(i % difficulty.x === 0) {
+                        //left edge
+                            //check up, right, down, up+right, down+right
+                        squares[i + 1].click()
+                        squares[i - difficulty.x].click()
+                        squares[i + difficulty.x].click()
+                        squares[i + 1 - difficulty.x].click()
+                        squares[i + 1 + difficulty.x].click()            
+                    } else if((i + 1) % difficulty.x === 0) {
+                        //right edge
+                            // check up, left, down, up+left, down+left
+                        squares[i - 1].click()
+                        squares[i - difficulty.x].click()
+                        squares[i + difficulty.x].click()
+                        squares[i - 1 - difficulty.x].click()
+                        squares[i - 1 + difficulty.x].click()            
+                    } else if(i < difficulty.x) {
+                        //top edge
+                            //check left, right, down, left+down, right+down
+                        squares[i + 1].click()
+                        squares[i - 1].click()
+                        squares[i + difficulty.x].click()
+                        squares[i + 1 + difficulty.x].click()
+                        squares[i - 1 + difficulty.x].click()            
+                    } else if(i >= difficulty.x * (difficulty.y - 1)) {
+                        //bottom edge
+                            //check left, right, up, left+up, right+up
+                        squares[i + 1].click()
+                        squares[i - 1].click()
+                        squares[i - difficulty.x].click()
+                        squares[i + 1 - difficulty.x].click()
+                        squares[i - 1 - difficulty.x].click()            
+                    } else {
+                        //central square
+                            //check up, down, left, right, up+left, up+right, down+left, down+right
+                        squares[i + 1].click()
+                        squares[i - 1].click()
+                        squares[i + difficulty.x].click()
+                        squares[i - difficulty.x].click()
+                        squares[i + 1 + difficulty.x].click()
+                        squares[i - 1 + difficulty.x].click()
+                        squares[i + 1 - difficulty.x].click()
+                        squares[i - 1 - difficulty.x].click()            
+                    }  
+                }
+            }
+            victory()                
+        })                
+    }
+}
 
 
 
 /*---------------------RIGHT CLICK---------------------*/
 
+function rightClick() {
+    const squares = document.querySelectorAll('.square')
+    for (let i = 0; i < squares.length; i++) {
+        const square = squares[i];
+        square.addEventListener('contextmenu', event => {
+            if(event.target.classList.contains('flagged')) {
+                event.target.classList.remove('flagged')
+                const flagCount = countFlags()
+                minesRemaining.textContent = 'mines remaining: ' + (difficulty.mines - flagCount)
+            } else {
+                event.target.classList.add('flagged')
+                const flagCount = countFlags()
+                minesRemaining.textContent = 'mines remaining: ' + (difficulty.mines - flagCount)
+            }
+        })        
+    }
+}
 
-/*-----------(IN/DE)CRIMENT MINES LEFT-----------*/
+function countFlags() {
+    const squares = document.querySelectorAll('.square')
+    let flags = 0
+    for (let i = 0; i < squares.length; i++) {
+        const square = squares[i];
+        if(square.classList.contains('flagged')) {
+            flags++
+        }        
+    }
+    return flags
+}
 
- 
-/*-----------PLACE/REMOVE FLAG-----------*/
 
 
+/*---------------------DOUBLE-CLICK---------------------*/
 
-
-/*---------------------LEFT+RIGHT CLICK---------------------*/
+function doubleClick() {
+    const squares = document.querySelectorAll('.square')
+    for (let i = 0; i < squares.length; i++) {
+        const square = squares[i];
+        square.addEventListener('dblclick', event => {
+            
+        })
+        
+    }
+}
 
 
 /*-----------CHECK FOR FLAGS-----------*/
@@ -379,7 +486,16 @@ function victory() {
 
 
 
+function init() {
+    resetButton.textContent = 'Reset'
+    choseDifficulty()
+    generateBoard()
+    populateMines()
+    gapFill()
+    leftClick()
+    rightClick()
+    minesRemaining.textContent = 'mines remaining: ' + difficulty.mines
+}
 
-generateBoard()
-populateMines()
-gapFill()
+init()
+resetButton.addEventListener('click', init)
