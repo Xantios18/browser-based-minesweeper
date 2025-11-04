@@ -351,7 +351,10 @@ function leftClick() {
                 event.target.classList.replace('closed', 'open')            
                 if(event.target.classList.contains('mine')) {
                     resetButton.textContent = 'You Lose'
-                    mines.classList.replace('closed', 'open')
+                    for (let j = 0; j < mines.length; j++) {
+                        const mine = mines[j];
+                        mine.classList.replace('closed', 'open')
+                    }
                 } else if(square.id === 'touching-0'){
                     if(i === 0) {
                         //top left
@@ -441,7 +444,7 @@ function rightClick() {
                 event.target.classList.remove('flagged')
                 const flagCount = countFlags()
                 minesRemaining.textContent = 'mines remaining: ' + (difficulty.mines - flagCount)
-            } else {
+            } else if(event.target.classList.contains('closed')) {
                 event.target.classList.add('flagged')
                 const flagCount = countFlags()
                 minesRemaining.textContent = 'mines remaining: ' + (difficulty.mines - flagCount)
@@ -465,13 +468,165 @@ function countFlags() {
 
 
 /*---------------------DOUBLE-CLICK---------------------*/
+let adjacentFlags;
+function checkForFlag(squareList, i) {
+        if(squareList[i].classList.contains('flagged')) {
+            adjacentFlags ++
+        }
+    }
 
+function surroundingFlags(squareList, i) {
+    adjacentFlags = 0
+    if(i === 0) {
+        //top left
+            //check right, down, right+down
+        checkForFlag(squareList, i + 1)
+        checkForFlag(squareList, i + difficulty.x)
+        checkForFlag(squareList, i + 1 + difficulty.x)
+    } else if(i === difficulty.x * (difficulty.y - 1)) {
+        //botom left
+            //check right, up, right+up
+        checkForFlag(squareList, i + 1)
+        checkForFlag(squareList, i - difficulty.x)
+        checkForFlag(squareList, i + 1 - difficulty.x)
+    } else if(i === difficulty.x - 1) {
+        //top right
+            //check left, down, left+down
+        checkForFlag(squareList, i - 1)
+        checkForFlag(squareList, i + difficulty.x)
+        checkForFlag(squareList, i - 1 + difficulty.x)
+    } else if(i === (difficulty.x * difficulty.y) - 1) {
+        //botom right
+            //check left, up, left+up
+        checkForFlag(squareList, i - 1)
+        checkForFlag(squareList, i - difficulty.x)
+        checkForFlag(squareList, i - 1 - difficulty.x)
+    } else if(i % difficulty.x === 0) {
+        //left edge
+            //check up, right, down, up+right, down+right
+        checkForFlag(squareList, i + 1)
+        checkForFlag(squareList, i - difficulty.x)
+        checkForFlag(squareList, i + difficulty.x)
+        checkForFlag(squareList, i + 1 - difficulty.x)
+        checkForFlag(squareList, i + 1 + difficulty.x)
+    } else if((i + 1) % difficulty.x === 0) {
+        //right edge
+            // check up, left, down, up+left, down+left
+        checkForFlag(squareList, i - 1)
+        checkForFlag(squareList, i - difficulty.x)
+        checkForFlag(squareList, i + difficulty.x)
+        checkForFlag(squareList, i - 1 - difficulty.x)
+        checkForFlag(squareList, i - 1 + difficulty.x)
+    } else if(i < difficulty.x) {
+        //top edge
+            //check left, right, down, left+down, right+down
+        checkForFlag(squareList, i + 1)
+        checkForFlag(squareList, i - 1)
+        checkForFlag(squareList, i + difficulty.x)
+        checkForFlag(squareList, i + 1 + difficulty.x)
+        checkForFlag(squareList, i - 1 + difficulty.x)
+    } else if(i >= difficulty.x * (difficulty.y - 1)) {
+        //bottom edge
+            //check left, right, up, left+up, right+up
+        checkForFlag(squareList, i + 1)
+        checkForFlag(squareList, i - 1)
+        checkForFlag(squareList, i - difficulty.x)
+        checkForFlag(squareList, i + 1 - difficulty.x)
+        checkForFlag(squareList, i - 1 - difficulty.x)
+    } else {
+        //central square
+            //check up, down, left, right, up+left, up+right, down+left, down+right
+        checkForFlag(squareList, i + 1)
+        checkForFlag(squareList, i - 1)
+        checkForFlag(squareList, i + difficulty.x)
+        checkForFlag(squareList, i - difficulty.x)
+        checkForFlag(squareList, i + 1 + difficulty.x)
+        checkForFlag(squareList, i - 1 + difficulty.x)
+        checkForFlag(squareList, i + 1 - difficulty.x)
+        checkForFlag(squareList, i - 1 - difficulty.x)
+    }
+}
+    
 function doubleClick() {
     const squares = document.querySelectorAll('.square')
     for (let i = 0; i < squares.length; i++) {
         const square = squares[i];
         square.addEventListener('dblclick', event => {
-            
+            if(event.target.classList.contains('open')) {
+                const touchingMines = Number(square.textContent)
+                adjacentFlags = 0
+                surroundingFlags(squares, i)
+                if(adjacentFlags === touchingMines) {
+                    if(i === 0) {
+                        //top left
+                            //check right, down, right+down
+                        squares[i + 1].click()
+                        squares[i + difficulty.x].click()
+                        squares[i + 1 + difficulty.x].click()            
+                    } else if(i === difficulty.x * (difficulty.y - 1)) {
+                        //botom left
+                            //check right, up, right+up
+                        squares[i + 1].click()
+                        squares[i - difficulty.x].click()
+                        squares[i + 1 - difficulty.x].click()            
+                    } else if(i === difficulty.x - 1) {
+                        //top right
+                            //check left, down, left+down
+                        squares[i - 1].click()
+                        squares[i + difficulty.x].click()
+                        squares[i - 1 + difficulty.x].click()            
+                    } else if(i === (difficulty.x * difficulty.y) - 1) {
+                        //botom right
+                            //check left, up, left+up
+                        squares[i - 1].click()
+                        squares[i - difficulty.x].click()
+                        squares[i - 1 - difficulty.x].click()            
+                    } else if(i % difficulty.x === 0) {
+                        //left edge
+                            //check up, right, down, up+right, down+right
+                        squares[i + 1].click()
+                        squares[i - difficulty.x].click()
+                        squares[i + difficulty.x].click()
+                        squares[i + 1 - difficulty.x].click()
+                        squares[i + 1 + difficulty.x].click()            
+                    } else if((i + 1) % difficulty.x === 0) {
+                        //right edge
+                            // check up, left, down, up+left, down+left
+                        squares[i - 1].click()
+                        squares[i - difficulty.x].click()
+                        squares[i + difficulty.x].click()
+                        squares[i - 1 - difficulty.x].click()
+                        squares[i - 1 + difficulty.x].click()            
+                    } else if(i < difficulty.x) {
+                        //top edge
+                            //check left, right, down, left+down, right+down
+                        squares[i + 1].click()
+                        squares[i - 1].click()
+                        squares[i + difficulty.x].click()
+                        squares[i + 1 + difficulty.x].click()
+                        squares[i - 1 + difficulty.x].click()            
+                    } else if(i >= difficulty.x * (difficulty.y - 1)) {
+                        //bottom edge
+                            //check left, right, up, left+up, right+up
+                        squares[i + 1].click()
+                        squares[i - 1].click()
+                        squares[i - difficulty.x].click()
+                        squares[i + 1 - difficulty.x].click()
+                        squares[i - 1 - difficulty.x].click()            
+                    } else {
+                        //central square
+                            //check up, down, left, right, up+left, up+right, down+left, down+right
+                        squares[i + 1].click()
+                        squares[i - 1].click()
+                        squares[i + difficulty.x].click()
+                        squares[i - difficulty.x].click()
+                        squares[i + 1 + difficulty.x].click()
+                        squares[i - 1 + difficulty.x].click()
+                        squares[i + 1 - difficulty.x].click()
+                        squares[i - 1 - difficulty.x].click()            
+                    } 
+                }
+            }
         })
         
     }
@@ -494,6 +649,7 @@ function init() {
     gapFill()
     leftClick()
     rightClick()
+    doubleClick()
     minesRemaining.textContent = 'mines remaining: ' + difficulty.mines
 }
 

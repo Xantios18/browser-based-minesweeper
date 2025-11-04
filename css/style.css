@@ -1,7 +1,4 @@
-#dashboard {
-    /* display: flex; */
 
-}
 
 
 
@@ -14,45 +11,44 @@
     border: solid 1px black;
     font-weight: bolder;
     text-align: center;
-    justify-content: center;
-
-    #touching-0 {
-        color: transparent;
-    }
-    #touching-1 {
-        color: blue;
-        text-shadow: 1px 1px black;
-    }
-    #touching-2 {
-        color: green;
-        text-shadow: 1px 1px black;
-    }
-    #touching-3 {
-        color: yellow;
-        text-shadow: 1px 1px black;
-    }
-    #touching-4 {
-        color: orange;
-        text-shadow: 1px 1px black;
-    }
-    #touching-5 {
-        color: red;
-        text-shadow: 1px 1px black;
-    }
-    #touching-6 {
-        color: purple;
-        text-shadow: 1px 1px black;
-    }
-    #touching-7 {
-        color: saddlebrown;
-        text-shadow: 1px 1px black;
-    }
-    #touching-8 {
-        color: black;
-        text-shadow: 1px 1px black;
-    }
+    justify-content: center;  
 }
 
+.open#touching-0 {
+    color: transparent;
+}
+.open#touching-1 {
+    color: blue;
+    text-shadow: 1px 1px black;
+}
+.open#touching-2 {
+    color: green;
+    text-shadow: 1px 1px black;
+}
+.open#touching-3 {
+    color: yellow;
+    text-shadow: 1px 1px black;
+}
+.open#touching-4 {
+    color: orange;
+    text-shadow: 1px 1px black;
+}
+.open#touching-5 {
+    color: red;
+    text-shadow: 1px 1px black;
+}
+.open#touching-6 {
+    color: purple;
+    text-shadow: 1px 1px black;
+}
+.open#touching-7 {
+    color: saddlebrown;
+    text-shadow: 1px 1px black;
+}
+.open#touching-8 {
+    color: black;
+    text-shadow: 1px 1px black;
+}
 
 
 .closed {
