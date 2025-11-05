@@ -93,7 +93,6 @@ function generateBoard() {
     for (let i = 0; i < (difficulty.x * difficulty.y); i++) {
         const square = document.createElement('div');
         square.classList.add('square', 'closed')
-        // square.textContent = i
         board.appendChild(square)
     }
 }
@@ -330,8 +329,6 @@ function victory() {
         }
     }
     resetButton.textContent = 'You Win!'
-    //freeze board
-    //flag all mines
 }
 
 
@@ -631,14 +628,6 @@ function doubleClick() {
         
     }
 }
-
-
-/*-----------CHECK FOR FLAGS-----------*/
-
-
-/*-----------OPEN ALL UNFLAGGED ADJACENT SPACES-----------*/
-
-
 
 
 function init() {
